@@ -875,10 +875,19 @@ function renderSurat() {
 }
 
 async function hapusSuratDariList(idDokumen) {
-  if (confirm('Hapus data surat ini?')) {
-    try { await window.fbDeleteDoc(window.fbDoc(window.firebaseDB, "surat", idDokumen)); } 
-    catch (error) { console.error("Error menghapus: ", error); alert("Gagal menghapus data."); }
-  }
+  bukaKonfirmasiHapus('Apakah Anda yakin ingin menghapus data surat ini?', async () => {
+    showLoading(); // Tampilkan Loading
+    try {
+      await window.fbDeleteDoc(window.fbDoc(window.firebaseDB, "surat", idDokumen));
+      
+      hideLoading(); // Sembunyikan Loading
+      showToast('Data surat berhasil dihapus!'); // Tampilkan Toast Hijau
+    } catch (error) {
+      hideLoading(); // Sembunyikan Loading jika Error
+      console.error("Error hapus surat: ", error);
+      alert("Gagal menghapus data surat.");
+    }
+  });
 }
 
 function printSurat() {
