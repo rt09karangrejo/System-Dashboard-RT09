@@ -1039,28 +1039,30 @@ async function printSuratDariFirebase(idDokumen) {
 function updateStatusSurat(idDokumen, statusBaru) {
   // Tentukan pesan, warna, dan teks tombol berdasarkan status
   let aksi = statusBaru === 'Disetujui' ? 'menyetujui' : 'menolak';
-  let warnaTombol = statusBaru === 'Disetujui' ? '#10b981' : '#f59e0b'; 
+  let warnaTombol = statusBaru === 'Disetujui' ? '#10b981' : '#f59e0b'; // Hijau untuk setujui, Kuning untuk tolak
   let teksTombol = statusBaru === 'Disetujui' ? 'Ya, Setujui' : 'Ya, Tolak';
 
+  // Panggil pop-up konfirmasi
   bukaKonfirmasiHapus(`Apakah Anda yakin ingin ${aksi} surat pengantar ini?`, async () => {
-    showLoading(); 
+    showLoading(); // Tampilkan Loading
     try {
       const { updateDoc } = await import("https://www.gstatic.com/firebasejs/13.1.0/firebase-firestore.js");
       const docRef = window.fbDoc(window.firebaseDB, "surat", idDokumen);
       
+      // Update status di database
       await updateDoc(docRef, {
         status: statusBaru
       });
       
-      hideLoading(); 
-      showToast(`Surat berhasil di${aksi}!`); 
+      hideLoading(); // Sembunyikan Loading
+      showToast(`Surat berhasil di${aksi}!`); // Tampilkan Toast
       
     } catch (error) {
-      hideLoading(); 
+      hideLoading(); // Sembunyikan Loading jika Error
       console.error("Error update status: ", error);
       alert("Gagal memproses surat.");
     }
-  }, teksTombol, warnaTombol); // <--- PASTIKAN BARIS INI ADA
+  }, teksTombol, warnaTombol); // <--- Kirim teks dan warna ke fungsi konfirmasi
 }
 async function printSuratDariFirebase(idDokumen) {
   try {
@@ -1545,15 +1547,17 @@ function bukaKonfirmasiHapus(pesan, callbackHapus, teksTombol = 'Ya, Hapus', war
   if (modal && pesanEl && btnHapus) {
     pesanEl.innerText = pesan;
     
-    // Ubah teks dan warna tombol
+    // Ubah teks dan warna tombol sesuai parameter
     btnHapus.innerText = teksTombol;
     btnHapus.style.background = warnaTombol;
 
     modal.classList.add('active');
 
+    // Hapus event listener lama agar tidak dobel
     const newBtnHapus = btnHapus.cloneNode(true);
     btnHapus.parentNode.replaceChild(newBtnHapus, btnHapus);
 
+    // Tambahkan event listener baru
     newBtnHapus.addEventListener('click', async () => {
       closeModal('modal-konfirmasi'); 
       await callbackHapus(); 
