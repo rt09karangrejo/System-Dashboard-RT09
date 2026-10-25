@@ -1037,32 +1037,29 @@ async function printSuratDariFirebase(idDokumen) {
 }
 
 function updateStatusSurat(idDokumen, statusBaru) {
-  // Tentukan pesan, warna, dan teks tombol berdasarkan status
   let aksi = statusBaru === 'Disetujui' ? 'menyetujui' : 'menolak';
-  let warnaTombol = statusBaru === 'Disetujui' ? '#10b981' : '#f59e0b'; // Hijau untuk setujui, Kuning untuk tolak
+  let warnaTombol = statusBaru === 'Disetujui' ? '#10b981' : '#f59e0b'; 
   let teksTombol = statusBaru === 'Disetujui' ? 'Ya, Setujui' : 'Ya, Tolak';
 
-  // Panggil pop-up konfirmasi
   bukaKonfirmasiHapus(`Apakah Anda yakin ingin ${aksi} surat pengantar ini?`, async () => {
-    showLoading(); // Tampilkan Loading
+    showLoading(); 
     try {
       const { updateDoc } = await import("https://www.gstatic.com/firebasejs/13.1.0/firebase-firestore.js");
       const docRef = window.fbDoc(window.firebaseDB, "surat", idDokumen);
       
-      // Update status di database
       await updateDoc(docRef, {
         status: statusBaru
       });
       
-      hideLoading(); // Sembunyikan Loading
-      showToast(`Surat berhasil di${aksi}!`); // Tampilkan Toast
+      hideLoading(); 
+      showToast(`Surat berhasil di${aksi}!`); 
       
     } catch (error) {
-      hideLoading(); // Sembunyikan Loading jika Error
+      hideLoading(); 
       console.error("Error update status: ", error);
       alert("Gagal memproses surat.");
     }
-  }, teksTombol, warnaTombol); // <--- Kirim teks dan warna ke fungsi konfirmasi
+  }, teksTombol, warnaTombol); 
 }
 async function printSuratDariFirebase(idDokumen) {
   try {
@@ -1435,24 +1432,7 @@ function showToast(message) {
     alert(message);
   }
 }
-async function updateStatusSurat(idDokumen, statusBaru) {
-  try {
-    const { updateDoc } = await import("https://www.gstatic.com/firebasejs/13.1.0/firebase-firestore.js");
-    const docRef = window.fbDoc(window.firebaseDB, "surat", idDokumen);
-    
-    // Update status di database
-    await updateDoc(docRef, {
-      status: statusBaru
-    });
-    
-    // Tampilkan notifikasi Toast
-    showToast(`Surat berhasil di${statusBaru === 'Disetujui' ? 'setujui' : 'tolak'}!`);
-    
-  } catch (error) {
-    console.error("Error update status: ", error);
-    alert("Gagal memproses surat.");
-  }
-}
+
 function hapusPengumuman(idDokumen) {
   bukaKonfirmasiHapus('Apakah Anda yakin ingin menghapus pengumuman ini?', async () => {
     showLoading();
