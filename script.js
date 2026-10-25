@@ -338,11 +338,19 @@ async function simpanEditWarga() {
   }
 }
 
-async function hapusWarga(idDokumen) {
-  if (confirm('Hapus data warga ini?')) {
-    try { await window.fbDeleteDoc(window.fbDoc(window.firebaseDB, "warga", idDokumen)); } 
-    catch (error) { console.error("Error hapus: ", error); }
-  }
+function hapusWarga(idDokumen) {
+  bukaKonfirmasiHapus('Apakah Anda yakin ingin menghapus data warga ini?', async () => {
+    showLoading();
+    try {
+      await window.fbDeleteDoc(window.fbDoc(window.firebaseDB, "warga", idDokumen));
+      hideLoading();
+      showToast('Data warga berhasil dihapus!');
+    } catch (error) {
+      hideLoading();
+      console.error("Error hapus warga: ", error);
+      alert("Gagal menghapus data.");
+    }
+  });
 }
 
 // =======================================================
@@ -546,15 +554,19 @@ async function simpanIuran() {
   }
 }
 
-async function hapusIuran(idDokumen) {
-  if (confirm('Hapus data iuran ini?')) {
+function hapusIuran(idDokumen) {
+  bukaKonfirmasiHapus('Apakah Anda yakin ingin menghapus data iuran ini?', async () => {
+    showLoading();
     try {
       await window.fbDeleteDoc(window.fbDoc(window.firebaseDB, "iuran", idDokumen));
+      hideLoading();
       showToast('Data iuran berhasil dihapus!');
     } catch (error) {
+      hideLoading();
       console.error("Error hapus iuran: ", error);
+      alert("Gagal menghapus data.");
     }
-  }
+  });
 }
 
 // =======================================================
@@ -1359,16 +1371,19 @@ async function lihatDetailPengaduan(idDokumen) {
     }
   } catch (error) { console.error("Error: ", error); }
 }
-async function hapusPengaduan(idDokumen) {
-  if (confirm('Apakah Anda yakin ingin menghapus pengaduan ini?')) {
+function hapusPengaduan(idDokumen) {
+  bukaKonfirmasiHapus('Apakah Anda yakin ingin menghapus pengaduan ini?', async () => {
+    showLoading();
     try {
       await window.fbDeleteDoc(window.fbDoc(window.firebaseDB, "pengaduan", idDokumen));
-      alert('Pengaduan berhasil dihapus!');
+      hideLoading();
+      showToast('Pengaduan berhasil dihapus!');
     } catch (error) {
+      hideLoading();
       console.error("Error hapus pengaduan: ", error);
       alert("Gagal menghapus pengaduan.");
     }
-  }
+  });
 }
 // =======================================================
 // FUNGSI NOTIFIKASI TOAST (PENGGANTI ALERT)
@@ -1408,16 +1423,19 @@ async function updateStatusSurat(idDokumen, statusBaru) {
     alert("Gagal memproses surat.");
   }
 }
-async function hapusPengumuman(idDokumen) {
-  if (confirm('Apakah Anda yakin ingin menghapus pengumuman ini?')) {
+function hapusPengumuman(idDokumen) {
+  bukaKonfirmasiHapus('Apakah Anda yakin ingin menghapus pengumuman ini?', async () => {
+    showLoading();
     try {
       await window.fbDeleteDoc(window.fbDoc(window.firebaseDB, "pengumuman", idDokumen));
+      hideLoading();
       showToast('Pengumuman berhasil dihapus!');
     } catch (error) {
-      console.error("Error hapus: ", error);
+      hideLoading();
+      console.error("Error hapus pengumuman: ", error);
       alert("Gagal menghapus pengumuman.");
     }
-  }
+  });
 }
 async function bukaEditPengumuman(idDokumen) {
   try {
@@ -1489,4 +1507,67 @@ function showToast(message) {
   } else {
     alert(message);
   }
+}
+// Fungsi untuk memunculkan pop-up konfirmasi hapus
+function bukaKonfirmasiHapus(pesan, callbackHapus) {
+  const modal = document.getElementById('modal-konfirmasi');
+  const pesanEl = document.getElementById('konfirmasi-pesan');
+  const btnHapus = document.getElementById('btn-konfirmasi-hapus');
+
+  if (modal && pesanEl && btnHapus) {
+    pesanEl.innerText = pesan;
+    modal.classList.add('active');
+
+    // Hapus event listener lama agar tidak dobel
+    const newBtnHapus = btnHapus.cloneNode(true);
+    btnHapus.parentNode.replaceChild(newBtnHapus, btnHapus);
+
+    // Tambahkan event listener baru
+    newBtnHapus.addEventListener('click', async () => {
+      closeModal('modal-konfirmasi'); 
+      await callbackHapus(); 
+    });
+  }
+}
+
+function showLoading() {
+  const overlay = document.getElementById('loading-overlay');
+  if (overlay) overlay.style.display = 'flex';
+}
+
+function hideLoading() {
+  const overlay = document.getElementById('loading-overlay');
+  if (overlay) overlay.style.display = 'none';
+}
+
+function showToast(message) {
+  const toast = document.getElementById('toast-notification');
+  const toastMsg = document.getElementById('toast-message');
+  
+  if(toast && toastMsg) {
+    toastMsg.innerText = message;
+    toast.classList.add("show");
+    setTimeout(function(){ toast.classList.remove("show"); }, 3000);
+  } else {
+    alert(message);
+  }
+}
+// =======================================================
+// FUNGSI HAPUS KK (DENGAN KONFIRMASI, LOADING & TOAST)
+// =======================================================
+function hapusKK(idDokumen) {
+  bukaKonfirmasiHapus('Apakah Anda yakin ingin menghapus data KK ini?', async () => {
+    showLoading(); // Tampilkan Loading
+    try {
+      // Hapus data dari Firebase
+      await window.fbDeleteDoc(window.fbDoc(window.firebaseDB, "kk", idDokumen));
+      
+      hideLoading(); // Sembunyikan Loading
+      showToast('Data KK berhasil dihapus!'); // Tampilkan Toast Hijau
+    } catch (error) {
+      hideLoading(); // Sembunyikan Loading jika Error
+      console.error("Error hapus KK: ", error);
+      alert("Gagal menghapus data KK.");
+    }
+  });
 }
