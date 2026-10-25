@@ -1518,15 +1518,18 @@ function bukaKonfirmasiHapus(pesan, callbackHapus) {
     pesanEl.innerText = pesan;
     modal.classList.add('active');
 
-    // Hapus event listener lama agar tidak dobel
     const newBtnHapus = btnHapus.cloneNode(true);
     btnHapus.parentNode.replaceChild(newBtnHapus, btnHapus);
 
-    // Tambahkan event listener baru
     newBtnHapus.addEventListener('click', async () => {
       closeModal('modal-konfirmasi'); 
       await callbackHapus(); 
     });
+  } else {
+    // Jika elemen modal tidak ditemukan, gunakan confirm bawaan browser sebagai cadangan
+    if (confirm(pesan)) {
+      callbackHapus();
+    }
   }
 }
 
@@ -1555,19 +1558,19 @@ function showToast(message) {
 // =======================================================
 // FUNGSI HAPUS KK (DENGAN KONFIRMASI, LOADING & TOAST)
 // =======================================================
-function hapusKK(idDokumen) {
-  bukaKonfirmasiHapus('Apakah Anda yakin ingin menghapus data KK ini?', async () => {
-    showLoading(); // Tampilkan Loading
-    try {
-      // Hapus data dari Firebase
-      await window.fbDeleteDoc(window.fbDoc(window.firebaseDB, "kk", idDokumen));
-      
-      hideLoading(); // Sembunyikan Loading
-      showToast('Data KK berhasil dihapus!'); // Tampilkan Toast Hijau
-    } catch (error) {
-      hideLoading(); // Sembunyikan Loading jika Error
-      console.error("Error hapus KK: ", error);
-      alert("Gagal menghapus data KK.");
-    }
-  });
-}
+  function hapusKK(idDokumen) {
+    bukaKonfirmasiHapus('Apakah Anda yakin ingin menghapus data KK ini?', async () => {
+      showLoading(); // Tampilkan Loading
+      try {
+        // Hapus data dari Firebase
+        await window.fbDeleteDoc(window.fbDoc(window.firebaseDB, "kk", idDokumen));
+        
+        hideLoading(); // Sembunyikan Loading
+        showToast('Data KK berhasil dihapus!'); // Tampilkan Toast Hijau
+      } catch (error) {
+        hideLoading(); // Sembunyikan Loading jika Error
+        console.error("Error hapus KK: ", error);
+        alert("Gagal menghapus data KK.");
+      }
+    });
+  }

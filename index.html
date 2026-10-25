@@ -780,3 +780,15 @@
     <i class="fas fa-check-circle" style="font-size: 18px;"></i>
     <span id="toast-message">Data Success to Saved</span>
   </div>
+
+    <!-- ================= MODAL KONFIRMASI HAPUS ================= -->
+  <div id="modal-konfirmasi" class="modal">
+    <div class="modal-content" style="max-width: 350px; text-align: center;">
+      <h3 style="margin-bottom: 15px;">Apakah Anda yakin?</h3>
+      <p id="konfirmasi-pesan" style="color: #64748b; margin-bottom: 25px; font-size: 14px;">Data ini akan dihapus permanen.</p>
+      <div class="modal-actions" style="justify-content: center;">
+        <button class="btn-secondary" onclick="closeModal('modal-konfirmasi')" style="margin-right: 10px;">Batal</button>
+        <button class="btn-primary" id="btn-konfirmasi-hapus" style="background: #ef4444;">Ya, Hapus</button>
+      </div>
+    </div>
+  </div>
