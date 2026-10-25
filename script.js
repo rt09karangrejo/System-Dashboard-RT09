@@ -322,12 +322,20 @@ async function simpanEditWarga() {
     status: document.getElementById('edit-w-status').value
   };
 
+  showLoading(); // Tampilkan Loading
+
   try {
     const { updateDoc } = await import("https://www.gstatic.com/firebasejs/13.1.0/firebase-firestore.js");
     await updateDoc(window.fbDoc(window.firebaseDB, "warga", idDokumen), dataBaru);
-    alert('Data warga berhasil diupdate!');
+    
+    hideLoading(); // Sembunyikan Loading
+    showToast('Data warga berhasil diupdate!'); // Tampilkan Toast
     closeModal('modal-edit-warga');
-  } catch (error) { console.error("Error update: ", error); alert('Gagal mengupdate data.'); }
+  } catch (error) { 
+    hideLoading(); // Sembunyikan Loading jika Error
+    console.error("Error update: ", error); 
+    alert('Gagal mengupdate data.'); 
+  }
 }
 
 async function hapusWarga(idDokumen) {
@@ -448,17 +456,20 @@ async function simpanEditKK() {
     jumlah: document.getElementById('edit-kk-jumlah').value.trim(),
     alamat: document.getElementById('edit-kk-alamat').value.trim()
   };
+  
+  showLoading(); // Tampilkan Loading
+
   try {
     const { updateDoc } = await import("https://www.gstatic.com/firebasejs/13.1.0/firebase-firestore.js");
     await updateDoc(window.fbDoc(window.firebaseDB, "kk", idDokumen), dataBaru);
-    alert('Data KK diupdate!'); closeModal('modal-edit-kk');
-  } catch (error) { console.error("Error: ", error); }
-}
-
-async function hapusKK(idDokumen) {
-  if (confirm('Hapus data KK ini?')) {
-    try { await window.fbDeleteDoc(window.fbDoc(window.firebaseDB, "kk", idDokumen)); } 
-    catch (error) { console.error("Error: ", error); }
+    
+    hideLoading(); // Sembunyikan Loading
+    showToast('Data KK berhasil diupdate!'); // Tampilkan Toast
+    closeModal('modal-edit-kk');
+  } catch (error) { 
+    hideLoading(); // Sembunyikan Loading jika Error
+    console.error("Error: ", error); 
+    alert('Gagal mengupdate data KK.'); 
   }
 }
 
@@ -1431,15 +1442,20 @@ async function simpanEditPengumuman() {
 
   if (!judulBaru || !isiBaru) return alert('Judul dan Isi tidak boleh kosong!');
 
+  showLoading(); // Tampilkan Loading
+
   try {
     const { updateDoc } = await import("https://www.gstatic.com/firebasejs/13.1.0/firebase-firestore.js");
     await updateDoc(window.fbDoc(window.firebaseDB, "pengumuman", idDokumen), {
       judul: judulBaru,
       isi: isiBaru
     });
-    showToast('Pengumuman berhasil diupdate!');
+    
+    hideLoading(); // Sembunyikan Loading
+    showToast('Pengumuman berhasil diupdate!'); // Tampilkan Toast
     closeModal('modal-edit-pengumuman');
   } catch (error) {
+    hideLoading(); // Sembunyikan Loading jika Error
     console.error("Error update: ", error);
     alert("Gagal mengupdate pengumuman.");
   }
