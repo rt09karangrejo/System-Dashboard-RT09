@@ -1036,12 +1036,31 @@ async function printSuratDariFirebase(idDokumen) {
   } catch (error) { console.error("Error print: ", error); alert("Gagal mencetak surat."); }
 }
 
-async function updateStatusSurat(idDokumen, statusBaru) {
-  try {
-    const { updateDoc } = await import("https://www.gstatic.com/firebasejs/13.1.0/firebase-firestore.js");
-    await updateDoc(window.fbDoc(window.firebaseDB, "surat", idDokumen), { status: statusBaru });
-    alert(`Surat berhasil di${statusBaru === 'Disetujui' ? 'setujui' : 'tolak'}!`);
-  } catch (error) { console.error("Error update status: ", error); alert("Gagal memproses surat."); }
+function updateStatusSurat(idDokumen, statusBaru) {
+  // Tentukan pesan, warna, dan teks tombol berdasarkan status
+  let aksi = statusBaru === 'Disetujui' ? 'menyetujui' : 'menolak';
+  let warnaTombol = statusBaru === 'Disetujui' ? '#10b981' : '#f59e0b'; 
+  let teksTombol = statusBaru === 'Disetujui' ? 'Ya, Setujui' : 'Ya, Tolak';
+
+  bukaKonfirmasiHapus(`Apakah Anda yakin ingin ${aksi} surat pengantar ini?`, async () => {
+    showLoading(); 
+    try {
+      const { updateDoc } = await import("https://www.gstatic.com/firebasejs/13.1.0/firebase-firestore.js");
+      const docRef = window.fbDoc(window.firebaseDB, "surat", idDokumen);
+      
+      await updateDoc(docRef, {
+        status: statusBaru
+      });
+      
+      hideLoading(); 
+      showToast(`Surat berhasil di${aksi}!`); 
+      
+    } catch (error) {
+      hideLoading(); 
+      console.error("Error update status: ", error);
+      alert("Gagal memproses surat.");
+    }
+  }, teksTombol, warnaTombol); // <--- PASTIKAN BARIS INI ADA
 }
 async function printSuratDariFirebase(idDokumen) {
   try {
@@ -1518,13 +1537,18 @@ function showToast(message) {
   }
 }
 // Fungsi untuk memunculkan pop-up konfirmasi hapus
-function bukaKonfirmasiHapus(pesan, callbackHapus) {
+function bukaKonfirmasiHapus(pesan, callbackHapus, teksTombol = 'Ya, Hapus', warnaTombol = '#ef4444') {
   const modal = document.getElementById('modal-konfirmasi');
   const pesanEl = document.getElementById('konfirmasi-pesan');
   const btnHapus = document.getElementById('btn-konfirmasi-hapus');
 
   if (modal && pesanEl && btnHapus) {
     pesanEl.innerText = pesan;
+    
+    // Ubah teks dan warna tombol
+    btnHapus.innerText = teksTombol;
+    btnHapus.style.background = warnaTombol;
+
     modal.classList.add('active');
 
     const newBtnHapus = btnHapus.cloneNode(true);
@@ -1535,7 +1559,6 @@ function bukaKonfirmasiHapus(pesan, callbackHapus) {
       await callbackHapus(); 
     });
   } else {
-    // Jika elemen modal tidak ditemukan, gunakan confirm bawaan browser sebagai cadangan
     if (confirm(pesan)) {
       callbackHapus();
     }
